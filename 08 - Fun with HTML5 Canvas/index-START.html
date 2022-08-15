@@ -1,19 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>HTML5 Canvas</title>
-</head>
-<body>
-<canvas id="draw" width="800" height="800"></canvas>
-<script>
-</script>
+  <head>
+    <meta charset="UTF-8" />
+    <title>HTML5 Canvas</title>
+  </head>
+  <body>
+    <canvas id="draw" width="800" height="800"></canvas>
 
-<style>
-  html, body {
-    margin: 0;
-  }
-</style>
+    <script>
+      const canvas = document.querySelector("#draw");
 
-</body>
+      const ctx = canvas.getContext("2d");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      ctx.strokeStyle = "#BADA55"; // starting color
+      ctx.lineJoin = "round"; // when lines join they are rounded
+      ctx.lineCap = "round"; // end of line drawn is rounded
+      ctx.lineWidth = 100;
+      // ctx.globalCompositeOperation = "screen";
+
+      let isDrawing = false; // only draws when cursor is clicked down
+
+      let lastX = 0; //need started and ending X and Y
+      let lastY = 0; //need started and ending X and Y
+      let hue = 0;
+      let direction = true;
+
+      const draw = (e) => {
+        if (!isDrawing) return; // stops function from draw when mouse is not clicked
+        console.log(e);
+        //sets stroke color to hsl with hue changing
+        ctx.strokeStyle = `hsl(${hue}, 100%, 50%)`;
+        ctx.beginPath();
+        // start from
+        ctx.moveTo(lastX, lastY);
+        // go to
+        ctx.lineTo(e.offsetX, e.offsetY);
+        ctx.stroke();
+        [lastX, lastY] = [e.offsetX, e.offsetY];
+        hue++;
+        hue >= 360 ? (hue = 0) : hue;
+        // when lineWidth hits 100 then flip direction or if less than 1
+        if (ctx.lineWidth >= 100 || ctx.lineWidth <= 1) {
+          direction = !direction;
+        }
+        // increases or decrements width
+        direction ? ctx.lineWidth++ : ctx.lineWidth--;
+      };
+
+      canvas.addEventListener("mousedown", (e) => {
+        isDrawing = true;
+        // updates X and Y to where mouse is
+        [lastX, lastY] = [e.offsetX, e.offsetY];
+      });
+      canvas.addEventListener("mousemove", draw);
+      canvas.addEventListener("mouseup", () => (isDrawing = false));
+      canvas.addEventListener("mouseout", () => (isDrawing = false)); // when you leave canvas with mousedown is sets to false
+    </script>
+
+    <style>
+      html,
+      body {
+        margin: 0;
+      }
+    </style>
+  </body>
 </html>
